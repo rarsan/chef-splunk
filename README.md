@@ -101,6 +101,11 @@ SSL in the `setup_ssl` recipe.
 * `node['splunk']['ssl_options']['enable_ssl']`: Whether to enable
   SSL, must be set to `true` to use the `setup_ssl` recipe. Defaults
   to `false`, must be set using a boolean literal `true` or `false`.
+* `node['splunk']['ssl_options']['use_default_certs']`: Whether to use
+  Splunk's default certificates. Recommended only for evaluation purposes
+  or for instances accessible behind firewall. This is still preferred over
+  default non-SSL Splunk web transmission. Defaults to `false`, must be set
+  using a boolean literal `true` or `false`.
 * `node['splunk']['ssl_options']['data_bag']`: The data bag name to
   load, defaults to `vault` (as chef-vault is used).
 * `node['splunk']['ssl_options']['data_bag_item']`: The data bag item
