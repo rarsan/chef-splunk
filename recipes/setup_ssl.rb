@@ -23,14 +23,6 @@ unless node['splunk']['ssl_options']['enable_ssl']
   return
 end
 
-include_recipe 'chef-vault'
-ssl_options = node['splunk']['ssl_options']
-
-certs = chef_vault_item(
-  ssl_options['data_bag'],
-  ssl_options['data_bag_item']
-)['data']
-
 # ensure that the splunk service resource is available without cloning
 # the resource (CHEF-3694). this is so the later notification works,
 # especially when using chefspec to run this cookbook's specs.
@@ -40,24 +32,35 @@ rescue Chef::Exceptions::ResourceNotFound
   service 'splunk'
 end
 
+ssl_options = node['splunk']['ssl_options']
+
+unless ssl_options['use_default_certs']
+  include_recipe 'chef-vault'
+
+  certs = chef_vault_item(
+    ssl_options['data_bag'],
+    ssl_options['data_bag_item']
+  )['data']
+
+  file "#{splunk_dir}/etc/auth/splunkweb/#{ssl_options['keyfile']}" do
+    content certs[ssl_options['keyfile']]
+    owner node['splunk']['user']['username']
+    group node['splunk']['user']['username']
+    mode 00600
+    notifies :restart, 'service[splunk]'
+  end
+
+  file "#{splunk_dir}/etc/auth/splunkweb/#{ssl_options['crtfile']}" do
+    content certs[ssl_options['crtfile']]
+    owner node['splunk']['user']['username']
+    group node['splunk']['user']['username']
+    mode 00600
+    notifies :restart, 'service[splunk]'
+  end
+end
+
 template "#{splunk_dir}/etc/system/local/web.conf" do
   source 'system-web.conf.erb'
   variables ssl_options
-  notifies :restart, 'service[splunk]'
-end
-
-file "#{splunk_dir}/etc/auth/splunkweb/#{ssl_options['keyfile']}" do
-  content certs[ssl_options['keyfile']]
-  owner node['splunk']['user']['username']
-  group node['splunk']['user']['username']
-  mode 00600
-  notifies :restart, 'service[splunk]'
-end
-
-file "#{splunk_dir}/etc/auth/splunkweb/#{ssl_options['crtfile']}" do
-  content certs[ssl_options['crtfile']]
-  owner node['splunk']['user']['username']
-  group node['splunk']['user']['username']
-  mode 00600
   notifies :restart, 'service[splunk]'
 end

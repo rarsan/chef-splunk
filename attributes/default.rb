@@ -33,6 +33,7 @@ default['splunk']['user'] = {
 
 default['splunk']['ssl_options'] = {
   'enable_ssl' => false,
+  'use_default_certs' => false,
   'data_bag' => 'vault',
   'data_bag_item' => 'splunk_certificates',
   'keyfile' => 'self-signed.example.com.key',
