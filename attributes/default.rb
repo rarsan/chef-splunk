@@ -74,7 +74,11 @@ default['splunk']['inputs_conf']['ports'] = []
 # because we don't want to rely on automagic.
 default['splunk']['user']['home'] = '/opt/splunk' if node['splunk']['is_server']
 
-default['splunk']['server']['runasroot'] = true
+default['splunk']['server'] = {
+  'runasroot': true,
+  'edit_datastore_dir': false,
+  'datastore_dir': '/opt/splunk/var/lib/splunk'
+}
 
 case node['platform_family']
 when 'rhel'
