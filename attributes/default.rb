@@ -75,9 +75,9 @@ default['splunk']['inputs_conf']['ports'] = []
 default['splunk']['user']['home'] = '/opt/splunk' if node['splunk']['is_server']
 
 default['splunk']['server'] = {
-  'runasroot': true,
-  'edit_datastore_dir': false,
-  'datastore_dir': '/opt/splunk/var/lib/splunk'
+  'runasroot' => true,
+  'edit_datastore_dir' => false,
+  'datastore_dir' => '/opt/splunk/var/lib/splunk'
 }
 
 case node['platform_family']
