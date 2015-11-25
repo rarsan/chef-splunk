@@ -49,17 +49,24 @@ if node['splunk']['is_server']
   end
 end
 
-if node['splunk']['accept_license']
-  # ftr = first time run file created by a splunk install
+# ftr = first time run file created by a splunk install
+if File.exist? "#{splunk_dir}/ftr"
   execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes" do
-    only_if { File.exist? "#{splunk_dir}/ftr" }
+    only_if { node['splunk']['accept_license'] }
   end
-end
 
-if node['splunk']['server']['edit_datastore_dir']
-  execute 'splunk_server_edit_datastore_dir' do
-    command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']}"
-    not_if "#{splunk_cmd} show datastore-dir | grep ': #{node['splunk']['server']['datastore_dir']}'"
+  if node['splunk']['server']['edit_datastore_dir']
+    # If using custom SPLUNK_DB path, chown to appropriate user (only during ftr)
+    directory "#{node['splunk']['server']['datastore_dir']}" do
+      owner myuser
+      group myuser
+      mode 00711
+    end
+
+    execute 'splunk_server_edit_datastore_dir_at_ftr' do
+      command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']}"
+      not_if "#{splunk_cmd} show datastore-dir | grep ': #{node['splunk']['server']['datastore_dir']}'"
+    end
   end
 end
 

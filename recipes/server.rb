@@ -42,6 +42,14 @@ execute 'update-splunk-mgmt-port' do
   notifies :restart, 'service[splunk]'
 end
 
+if node['splunk']['server']['edit_datastore_dir']
+  execute 'update-datastore-dir' do
+    command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']} -auth '#{splunk_auth_info}'"
+    not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'"
+    notifies :restart, 'service[splunk]'
+  end
+end
+
 execute 'enable-splunk-receiver-port' do
   command "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth '#{splunk_auth_info}'"
   not_if do

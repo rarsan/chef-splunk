@@ -68,4 +68,24 @@ describe 'chef-splunk::server' do
       )
     end
   end
+
+  context 'custom datastore dir' do
+    before(:each) do
+      stub_command("/opt/splunk/bin/splunk show splunkd-port -auth '#{secrets['splunk__default']['auth']}' | grep ': 8089'").and_return("Splunkd port: 8089") 
+      stub_command("/opt/splunk/bin/splunk show datastore-dir -auth '#{secrets['splunk__default']['auth']}' | grep ': /datadrive'").and_return(false) 
+      chef_run_init.node.set['splunk']['server']['edit_datastore_dir'] = true
+      chef_run_init.node.set['splunk']['server']['datastore_dir'] = '/datadrive'
+    end
+
+    it 'updates the datastore dir' do
+      expect(chef_run).to run_execute('update-datastore-dir').with(
+        'command' => "/opt/splunk/bin/splunk set datastore-dir /datadrive -auth '#{secrets['splunk__default']['auth']}'"
+      )
+    end
+
+    it 'notifies the splunk service to restart when updating datastore dir' do
+      execution = chef_run.execute('update-datastore-dir')
+      expect(execution).to notify('service[splunk]').to(:restart)
+    end
+  end
 end
