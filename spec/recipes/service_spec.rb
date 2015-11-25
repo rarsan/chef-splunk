@@ -29,8 +29,8 @@ describe 'chef-splunk::service' do
 
   context 'splunk server with custom datastore dir' do
     before(:each) do
-      stub_command("/opt/splunk/bin/splunk show datastore_dir | grep ': /datadrive'").and_return(false) 
-      stub_command("/opt/splunk/bin/splunk set datastore_dir /datadrive").and_return("Datastore path changed to '/datadrive'")
+      stub_command("/opt/splunk/bin/splunk show datastore-dir | grep ': /datadrive'").and_return(false) 
+      stub_command("/opt/splunk/bin/splunk set datastore-dir /datadrive").and_return("Datastore path changed to '/datadrive'")
       chef_run_init.node.set['splunk']['is_server'] = true
       chef_run_init.node.set['splunk']['server']['edit_datastore_dir'] = true
       chef_run_init.node.set['splunk']['server']['datastore_dir'] = '/datadrive'
@@ -44,7 +44,7 @@ describe 'chef-splunk::service' do
 
     it 'sets the datastore dir' do
       expect(chef_run).to run_execute('splunk_server_edit_datastore_dir').with(
-        'command' => '/opt/splunk/bin/splunk set datastore_dir /datadrive'
+        'command' => '/opt/splunk/bin/splunk set datastore-dir /datadrive'
       )
     end 
 

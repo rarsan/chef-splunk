@@ -58,8 +58,8 @@ end
 
 if node['splunk']['server']['edit_datastore_dir']
   execute 'splunk_server_edit_datastore_dir' do
-    command "#{splunk_cmd} set datastore_dir #{node['splunk']['server']['datastore_dir']}"
-    not_if "#{splunk_cmd} show datastore_dir | grep ': #{node['splunk']['server']['datastore_dir']}'"
+    command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']}"
+    not_if "#{splunk_cmd} show datastore-dir | grep ': #{node['splunk']['server']['datastore_dir']}'"
   end
 end
 
