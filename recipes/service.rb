@@ -49,8 +49,8 @@ if node['splunk']['is_server']
   end
 end
 
-# ftr = first time run file created by a splunk install
-if File.exist? "#{splunk_dir}/ftr"
+# Accept license & set datastore dir once at first time run
+if !File.exist?("#{splunk_dir}/etc/.setup_service")
   execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes" do
     only_if { node['splunk']['accept_license'] }
   end
@@ -96,6 +96,13 @@ template '/etc/init.d/splunk' do
     splunkdir: splunk_dir,
     runasroot: node['splunk']['server']['runasroot']
   )
+end
+
+file "#{splunk_dir}/etc/.setup_service" do
+  content 'true\n'
+  owner node['splunk']['user']['username']
+  group node['splunk']['user']['username']
+  mode 00600
 end
 
 service 'splunk' do
