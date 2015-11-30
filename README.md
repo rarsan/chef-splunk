@@ -65,7 +65,14 @@ General attributes:
 * `node['splunk']['web_port']`: The port that the splunkweb service
   listens to. This is set to the default for HTTPS, 443, as it is
   configured by the `setup_ssl` recipe.
-* `node['splunk']['ratelimit_kilobytessec']`: The default splunk rate limiting rate can now easily be changed with an attribute.  Default is 2048KBytes/sec.
+* `node['splunk']['ratelimit_kilobytessec']`: The default splunk rate
+  limiting rate can now easily be changed with an attribute.
+  Default is 2048KBytes/sec.
+* `node['splunk']['server']['edit_datastore_dir']`: Set this to true if
+  using custom SPLUNK_DB path. Default is false.
+* `node['splunk']['server']['datastore_dir']`: The path for SPLUNK_DB.
+  This is only applicable if `node['splunk']['server']['edit_datastore_dir']`
+  is set to true. Defaults to `/opt/splunk/var/lib/splunk`.
 
 The two URL attributes below are selected by platform and architecture
 by default.
