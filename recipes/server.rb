@@ -50,6 +50,23 @@ if node['splunk']['server']['edit_datastore_dir']
   end
 end
 
+unless node['splunk']['server']['is_license_master']
+  license_master = search( # ~FC003
+    :node, "\
+    splunk_server_is_license_master:true AND \
+    chef_environment:#{node.chef_environment}"
+  ).first
+
+  if license_master
+    execute 'link-to-license-master' do
+      command "#{splunk_cmd} edit licenser-localslave -master_uri 'https://#{license_master['ipaddress'] || license_master['fqdn']}:#{license_master['splunk']['mgmt_port']}' -auth '#{splunk_auth_info}'"
+      retries 5
+      ignore_failure true
+      notifies :restart, 'service[splunk]'
+    end
+  end
+end
+
 execute 'enable-splunk-receiver-port' do
   command "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth '#{splunk_auth_info}'"
   not_if do

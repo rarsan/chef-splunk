@@ -88,4 +88,26 @@ describe 'chef-splunk::server' do
       expect(execution).to notify('service[splunk]').to(:restart)
     end
   end
+
+  context 'remote license master' do
+    before(:each) do
+      stub_command("/opt/splunk/bin/splunk show splunkd-port -auth '#{secrets['splunk__default']['auth']}' | grep ': 8089'").and_return("Splunkd port: 8089")
+      # Publish mock license master node to the server
+      license_master_node = stub_node(platform: 'ubuntu', version: '12.04') do |node|
+        node.automatic['fqdn'] = 'license-master.example.com'
+        node.automatic['ipaddress'] = '192.168.0.10'
+        node.set['dev_mode'] = true
+        node.set['splunk']['is_server'] = true
+        node.set['splunk']['mgmt_port'] = '8089'
+        node.set['splunk']['server']['is_license_master'] = true
+      end
+      chef_run_init.create_node(license_master_node)
+    end
+
+    it 'links to license master' do
+      expect(chef_run).to run_execute('link-to-license-master').with(
+        'command' => "/opt/splunk/bin/splunk edit licenser-localslave -master_uri 'https://192.168.0.10:8089' -auth '#{secrets['splunk__default']['auth']}'"
+      )
+    end
+  end
 end

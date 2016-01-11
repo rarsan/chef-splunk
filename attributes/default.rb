@@ -76,6 +76,7 @@ default['splunk']['user']['home'] = '/opt/splunk' if node['splunk']['is_server']
 
 default['splunk']['server'] = {
   'runasroot' => true,
+  'is_license_master' => false,
   'edit_datastore_dir' => false,
   'datastore_dir' => '/opt/splunk/var/lib/splunk'
 }
