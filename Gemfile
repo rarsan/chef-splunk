@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'chef-vault', '~> 2.4.0'
+gem 'chef-vault', '~> 2.6'
 
 group :rake do
   gem 'rake'
