@@ -60,7 +60,7 @@ unless node['splunk']['server']['is_license_master']
   if license_master
     execute 'link-to-license-master' do
       command "#{splunk_cmd} edit licenser-localslave -master_uri 'https://#{license_master['ipaddress'] || license_master['fqdn']}:#{license_master['splunk']['mgmt_port']}' -auth '#{splunk_auth_info}'"
-      retries 5
+      retries 3
       ignore_failure true
       notifies :restart, 'service[splunk]'
     end
