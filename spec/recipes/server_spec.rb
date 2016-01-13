@@ -71,8 +71,8 @@ describe 'chef-splunk::server' do
 
   context 'custom datastore dir' do
     before(:each) do
-      stub_command("/opt/splunk/bin/splunk show splunkd-port -auth '#{secrets['splunk__default']['auth']}' | grep ': 8089'").and_return("Splunkd port: 8089") 
-      stub_command("/opt/splunk/bin/splunk show datastore-dir -auth '#{secrets['splunk__default']['auth']}' | grep ': /datadrive'").and_return(false) 
+      stub_command("/opt/splunk/bin/splunk show splunkd-port -auth '#{secrets['splunk__default']['auth']}' | grep ': 8089'").and_return('Splunkd port: 8089')
+      stub_command("/opt/splunk/bin/splunk show datastore-dir -auth '#{secrets['splunk__default']['auth']}' | grep ': /datadrive'").and_return(false)
       chef_run_init.node.set['splunk']['server']['edit_datastore_dir'] = true
       chef_run_init.node.set['splunk']['server']['datastore_dir'] = '/datadrive'
     end
@@ -89,9 +89,10 @@ describe 'chef-splunk::server' do
     end
   end
 
-  context 'remote license master' do
+  context 'local slave license' do
     before(:each) do
-      stub_command("/opt/splunk/bin/splunk show splunkd-port -auth '#{secrets['splunk__default']['auth']}' | grep ': 8089'").and_return("Splunkd port: 8089")
+      stub_command("/opt/splunk/bin/splunk show splunkd-port -auth '#{secrets['splunk__default']['auth']}' | grep ': 8089'").and_return('Splunkd port: 8089')
+      chef_run_init.node.set['splunk']['server']['license'] = 'slave'
       # Publish mock license master node to the server
       license_master_node = stub_node(platform: 'ubuntu', version: '12.04') do |node|
         node.automatic['fqdn'] = 'license-master.example.com'
@@ -99,7 +100,7 @@ describe 'chef-splunk::server' do
         node.set['dev_mode'] = true
         node.set['splunk']['is_server'] = true
         node.set['splunk']['mgmt_port'] = '8089'
-        node.set['splunk']['server']['is_license_master'] = true
+        node.set['splunk']['server']['license'] = 'master'
       end
       chef_run_init.create_node(license_master_node)
     end

@@ -50,10 +50,10 @@ if node['splunk']['server']['edit_datastore_dir']
   end
 end
 
-unless node['splunk']['server']['is_license_master']
+if node['splunk']['server']['license'] == 'slave'
   license_master = search( # ~FC003
     :node, "\
-    splunk_server_is_license_master:true AND \
+    splunk_server_license:master AND \
     chef_environment:#{node.chef_environment}"
   ).first
 
