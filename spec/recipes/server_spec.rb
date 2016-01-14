@@ -38,6 +38,10 @@ describe 'chef-splunk::server' do
       expect(chef_run).to_not run_execute('update-splunk-mgmt-port')
     end
 
+    it 'does not link to any license master' do
+      expect(chef_run).to_not run_execute('link-to-license-master')
+    end
+
     it 'enables receiver port' do
       expect(chef_run).to run_execute('enable-splunk-receiver-port').with(
         'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
