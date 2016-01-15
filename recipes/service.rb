@@ -50,7 +50,7 @@ if node['splunk']['is_server']
 end
 
 # Accept license & set datastore dir once at first time run
-if !File.exist?("#{splunk_dir}/etc/.setup_service")
+unless File.exist?("#{splunk_dir}/etc/.setup_service")
   execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes" do
     only_if { node['splunk']['accept_license'] }
   end
