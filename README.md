@@ -78,6 +78,10 @@ General attributes:
 * `node['splunk']['server']['datastore_dir']`: The path for SPLUNK_DB.
   This is only applicable if `node['splunk']['server']['edit_datastore_dir']`
   is set to true. Defaults to `/opt/splunk/var/lib/splunk`.
+* `node['splunk']['server']['license']`: Splunk server license mode determining
+  whether it is a standalone licenser (`standalone`), or a license master (`master`)
+  or connects to a remote license master (`slave`). Must be set using string
+  literal 'master', 'slave', or 'standalone' (default).
 
 The two URL attributes below are selected by platform and architecture
 by default.
