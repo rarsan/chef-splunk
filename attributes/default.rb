@@ -82,7 +82,7 @@ default['splunk']['server'] = {
 }
 
 case node['platform_family']
-when 'rhel'
+when 'rhel', 'fedora'
   if node['kernel']['machine'] == 'x86_64'
     default['splunk']['forwarder']['url'] = 'http://download.splunk.com/releases/6.3.2/universalforwarder/linux/splunkforwarder-6.3.2-aaff59bb082c-linux-2.6-x86_64.rpm'
     default['splunk']['server']['url'] = 'http://download.splunk.com/releases/6.3.2/splunk/linux/splunk-6.3.2-aaff59bb082c-linux-2.6-x86_64.rpm'
