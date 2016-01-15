@@ -115,4 +115,43 @@ describe 'chef-splunk::server' do
       )
     end
   end
+
+  context 'clustering enabled' do
+    before(:each) do
+      stub_command("/opt/splunk/bin/splunk show splunkd-port -auth '#{secrets['splunk__default']['auth']}' | grep ': 8089'").and_return('Splunkd port: 8089')
+      chef_run_init.node.set['splunk']['clustering']['enabled'] = true
+    end
+
+    context 'peer node' do
+      before(:each) do
+        chef_run_init.node.set['splunk']['clustering']['mode'] = 'slave'
+      end
+
+      it 'enables receiver port' do
+        expect(chef_run).to run_execute('enable-splunk-receiver-port').with(
+          'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
+        )
+      end
+    end
+
+    context 'non indexer node (master)' do
+      before(:each) do
+        chef_run_init.node.set['splunk']['clustering']['mode'] = 'master'
+      end
+
+      it 'does not enable receiver port' do
+        expect(chef_run).to_not run_execute('enable-splunk-receiver-port')
+      end
+    end
+
+    context 'non indexer node (search head)' do
+      before(:each) do
+        chef_run_init.node.set['splunk']['clustering']['mode'] = 'searchhead'
+      end
+
+      it 'does not enable receiver port' do
+        expect(chef_run).to_not run_execute('enable-splunk-receiver-port')
+      end
+    end
+  end
 end
