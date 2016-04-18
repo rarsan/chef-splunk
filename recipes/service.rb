@@ -107,5 +107,5 @@ end
 service 'splunk' do
   supports status: true, restart: true
   provider Chef::Provider::Service::Init
-  action :start
+  action :nothing
 end
