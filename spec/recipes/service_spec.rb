@@ -22,8 +22,8 @@ describe 'chef-splunk::service' do
       expect(chef_run).to_not run_execute('splunk_server_edit_datastore_dir_at_ftr')
     end 
 
-    it 'starts the splunk service' do
-      expect(chef_run).to start_service('splunk')
+    it 'does not starts the splunk service' do
+      expect(chef_run).to_not start_service('splunk')
     end
   end
 
@@ -48,8 +48,8 @@ describe 'chef-splunk::service' do
       )
     end
 
-    it 'starts the splunk service' do
-      expect(chef_run).to start_service('splunk')
+    it 'does not start the splunk service' do
+      expect(chef_run).to_not start_service('splunk')
     end
   end
 end

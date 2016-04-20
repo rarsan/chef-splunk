@@ -70,3 +70,7 @@ end
 
 include_recipe 'chef-splunk::service'
 include_recipe 'chef-splunk::setup_auth' if node['splunk']['setup_auth']
+
+service 'splunk' do
+  action :start
+end

@@ -47,6 +47,10 @@ describe 'chef-splunk::server' do
         'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
       )
     end
+
+    it 'starts the splunk service' do
+      expect(chef_run).to start_service('splunk')
+    end
   end
 
   context 'custom management port' do
@@ -71,6 +75,10 @@ describe 'chef-splunk::server' do
         'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
       )
     end
+
+    it 'starts the splunk service' do
+      expect(chef_run).to start_service('splunk')
+    end
   end
 
   context 'custom datastore dir' do
@@ -90,6 +98,10 @@ describe 'chef-splunk::server' do
     it 'notifies the splunk service to restart when updating datastore dir' do
       execution = chef_run.execute('update-datastore-dir')
       expect(execution).to notify('service[splunk]').to(:restart)
+    end
+
+    it 'starts the splunk service' do
+      expect(chef_run).to start_service('splunk')
     end
   end
 
@@ -114,6 +126,10 @@ describe 'chef-splunk::server' do
         'command' => "/opt/splunk/bin/splunk edit licenser-localslave -master_uri 'https://192.168.0.10:8089' -auth '#{secrets['splunk__default']['auth']}'"
       )
     end
+
+    it 'starts the splunk service' do
+      expect(chef_run).to start_service('splunk')
+    end
   end
 
   context 'clustering enabled' do
@@ -132,6 +148,10 @@ describe 'chef-splunk::server' do
           'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
         )
       end
+
+      it 'starts the splunk service' do
+        expect(chef_run).to start_service('splunk')
+      end
     end
 
     context 'non indexer node (master)' do
@@ -142,6 +162,10 @@ describe 'chef-splunk::server' do
       it 'does not enable receiver port' do
         expect(chef_run).to_not run_execute('enable-splunk-receiver-port')
       end
+
+      it 'starts the splunk service' do
+        expect(chef_run).to start_service('splunk')
+      end
     end
 
     context 'non indexer node (search head)' do
@@ -151,6 +175,10 @@ describe 'chef-splunk::server' do
 
       it 'does not enable receiver port' do
         expect(chef_run).to_not run_execute('enable-splunk-receiver-port')
+      end
+
+      it 'starts the splunk service' do
+        expect(chef_run).to start_service('splunk')
       end
     end
   end

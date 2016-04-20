@@ -38,14 +38,16 @@ splunk_auth_info = chef_vault_item(:vault, "splunk_#{node.chef_environment}")['a
 
 execute 'update-splunk-mgmt-port' do
   command "#{splunk_cmd} set splunkd-port #{node['splunk']['mgmt_port']} -auth '#{splunk_auth_info}'"
-  not_if "#{splunk_cmd} show splunkd-port -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['mgmt_port']}'"
+  user splunk_user
+  not_if "#{splunk_cmd} show splunkd-port -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['mgmt_port']}'", :user => splunk_user
   notifies :restart, 'service[splunk]'
 end
 
 if node['splunk']['server']['edit_datastore_dir']
   execute 'update-datastore-dir' do
     command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']} -auth '#{splunk_auth_info}'"
-    not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'"
+    user splunk_user
+    not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
     notifies :restart, 'service[splunk]'
   end
 end
@@ -60,6 +62,7 @@ if node['splunk']['server']['license'] == 'slave'
   if license_master
     execute 'link-to-license-master' do
       command "#{splunk_cmd} edit licenser-localslave -master_uri 'https://#{license_master['ipaddress'] || license_master['fqdn']}:#{license_master['splunk']['mgmt_port']}' -auth '#{splunk_auth_info}'"
+      user splunk_user
       retries 3
       ignore_failure true
       notifies :restart, 'service[splunk]'
@@ -70,6 +73,7 @@ end
 if !node['splunk']['clustering']['enabled'] || node['splunk']['clustering']['mode'] == 'slave'
   execute 'enable-splunk-receiver-port' do
     command "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth '#{splunk_auth_info}'"
+    user splunk_user
     not_if do
       # TCPSocket will return a file descriptor if it can open the
       # connection, and raise Errno::ECONNREFUSED if it can't. We rescue
@@ -89,4 +93,8 @@ end
 
 if node['splunk']['clustering']['enabled']
   include_recipe 'chef-splunk::setup_clustering'
+end
+
+service 'splunk' do
+  action :start
 end

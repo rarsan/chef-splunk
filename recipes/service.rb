@@ -18,15 +18,10 @@
 # limitations under the License.
 #
 
-myuser = 'root'
-unless node['splunk']['server']['runasroot']
-  myuser = node['splunk']['user']['username']
-end
-
 if node['splunk']['is_server']
   directory splunk_dir do
-    owner myuser
-    group myuser
+    owner splunk_user
+    group splunk_user
     mode 00755
   end
 
@@ -57,15 +52,16 @@ unless File.exist?("#{splunk_dir}/etc/.setup_service")
 
   if node['splunk']['server']['edit_datastore_dir']
     # If using custom SPLUNK_DB path, chown to appropriate user (only during ftr)
-    directory "#{node['splunk']['server']['datastore_dir']}" do
-      owner myuser
-      group myuser
+    directory node['splunk']['server']['datastore_dir'] do
+      owner splunk_user
+      group splunk_user
       mode 00711
     end
 
     execute 'splunk_server_edit_datastore_dir_at_ftr' do
       command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']}"
-      not_if "#{splunk_cmd} show datastore-dir | grep ': #{node['splunk']['server']['datastore_dir']}'"
+      user splunk_user
+      not_if "#{splunk_cmd} show datastore-dir | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
     end
   end
 end
@@ -81,7 +77,7 @@ ruby_block 'splunk_fix_file_ownership' do
     checkowner.each do |dir|
       next unless File.exist? dir
       if File.stat(dir).uid.eql?(0)
-        FileUtils.chown_R(myuser, myuser, splunk_dir)
+        FileUtils.chown_R(splunk_user, splunk_user, splunk_dir)
       end
     end
   end

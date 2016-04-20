@@ -24,6 +24,14 @@ def splunk_file(uri)
   Pathname.new(URI.parse(uri).path).basename.to_s
 end
 
+def splunk_user
+  if node['splunk']['server']['runasroot']
+    'root'
+  else
+    node['splunk']['user']['username']
+  end
+end
+
 def splunk_cmd
   "#{splunk_dir}/bin/splunk"
 end
