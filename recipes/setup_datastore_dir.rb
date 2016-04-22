@@ -44,6 +44,7 @@ if node['splunk']['server']['edit_datastore_dir']
     command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']} -auth '#{splunk_auth_info}'"
     user splunk_user
     group splunk_user
+    environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
     not_if { ::File.exist?("#{splunk_dir}/etc/.initialize_datastore") }
     not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
   end

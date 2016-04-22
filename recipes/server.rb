@@ -41,6 +41,7 @@ execute 'update-splunk-mgmt-port' do
   command "#{splunk_cmd} set splunkd-port #{node['splunk']['mgmt_port']} -auth '#{splunk_auth_info}'"
   user splunk_user
   group splunk_user
+  environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
   not_if "#{splunk_cmd} show splunkd-port -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['mgmt_port']}'", :user => splunk_user
   notifies :restart, 'service[splunk]'
 end
@@ -57,6 +58,7 @@ if node['splunk']['server']['license'] == 'slave'
       command "#{splunk_cmd} edit licenser-localslave -master_uri 'https://#{license_master['ipaddress'] || license_master['fqdn']}:#{license_master['splunk']['mgmt_port']}' -auth '#{splunk_auth_info}'"
       user splunk_user
       group splunk_user
+      environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
       retries 3
       ignore_failure true
       notifies :restart, 'service[splunk]'
@@ -69,6 +71,7 @@ if !node['splunk']['clustering']['enabled'] || node['splunk']['clustering']['mod
     command "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth '#{splunk_auth_info}'"
     user splunk_user
     group splunk_user
+    environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
     not_if do
       # TCPSocket will return a file descriptor if it can open the
       # connection, and raise Errno::ECONNREFUSED if it can't. We rescue
