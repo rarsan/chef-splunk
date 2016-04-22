@@ -21,6 +21,7 @@ node.default['splunk']['is_server'] = true
 include_recipe 'chef-splunk::user'
 include_recipe 'chef-splunk::install_server'
 include_recipe 'chef-splunk::service'
+include_recipe 'chef-splunk::initialize_datastore'
 include_recipe 'chef-splunk::setup_auth'
 
 # ensure that the splunk service resource is available without cloning
@@ -39,17 +40,9 @@ splunk_auth_info = chef_vault_item(:vault, "splunk_#{node.chef_environment}")['a
 execute 'update-splunk-mgmt-port' do
   command "#{splunk_cmd} set splunkd-port #{node['splunk']['mgmt_port']} -auth '#{splunk_auth_info}'"
   user splunk_user
+  group splunk_user
   not_if "#{splunk_cmd} show splunkd-port -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['mgmt_port']}'", :user => splunk_user
   notifies :restart, 'service[splunk]'
-end
-
-if node['splunk']['server']['edit_datastore_dir']
-  execute 'update-datastore-dir' do
-    command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']} -auth '#{splunk_auth_info}'"
-    user splunk_user
-    not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
-    notifies :restart, 'service[splunk]'
-  end
 end
 
 if node['splunk']['server']['license'] == 'slave'
@@ -63,6 +56,7 @@ if node['splunk']['server']['license'] == 'slave'
     execute 'link-to-license-master' do
       command "#{splunk_cmd} edit licenser-localslave -master_uri 'https://#{license_master['ipaddress'] || license_master['fqdn']}:#{license_master['splunk']['mgmt_port']}' -auth '#{splunk_auth_info}'"
       user splunk_user
+      group splunk_user
       retries 3
       ignore_failure true
       notifies :restart, 'service[splunk]'
@@ -74,6 +68,7 @@ if !node['splunk']['clustering']['enabled'] || node['splunk']['clustering']['mod
   execute 'enable-splunk-receiver-port' do
     command "#{splunk_cmd} enable listen #{node['splunk']['receiver_port']} -auth '#{splunk_auth_info}'"
     user splunk_user
+    group splunk_user
     not_if do
       # TCPSocket will return a file descriptor if it can open the
       # connection, and raise Errno::ECONNREFUSED if it can't. We rescue

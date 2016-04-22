@@ -44,25 +44,10 @@ if node['splunk']['is_server']
   end
 end
 
-# Accept license & set datastore dir once at first time run
+# Accept license at first time run
 unless File.exist?("#{splunk_dir}/etc/.setup_service")
   execute "#{splunk_cmd} enable boot-start --accept-license --answer-yes" do
     only_if { node['splunk']['accept_license'] }
-  end
-
-  if node['splunk']['server']['edit_datastore_dir']
-    # If using custom SPLUNK_DB path, chown to appropriate user (only during ftr)
-    directory node['splunk']['server']['datastore_dir'] do
-      owner splunk_user
-      group splunk_user
-      mode 00711
-    end
-
-    execute 'splunk_server_edit_datastore_dir_at_ftr' do
-      command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']}"
-      user splunk_user
-      not_if "#{splunk_cmd} show datastore-dir | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
-    end
   end
 end
 
