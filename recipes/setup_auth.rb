@@ -25,6 +25,7 @@ user, pw = splunk_auth_info.split(':')
 execute 'change-admin-user-password-from-default' do
   command "#{splunk_cmd} edit user #{user} -password '#{pw}' -role admin -auth admin:changeme"
   user splunk_user
+  group splunk_user
   not_if { ::File.exist?("#{splunk_dir}/etc/.setup_#{user}_password") }
 end
 
