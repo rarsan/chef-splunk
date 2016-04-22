@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: splunk
-# Recipe:: initialize_datastore
+# Recipe:: setup_datastore_dir
 #
 # Author: Roy Arsan <rarsan@splunk.com>
 # Copyright (c) 2014, Chef Software, Inc <legal@chef.io>

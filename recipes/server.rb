@@ -22,7 +22,7 @@ include_recipe 'chef-splunk::user'
 include_recipe 'chef-splunk::install_server'
 include_recipe 'chef-splunk::service'
 include_recipe 'chef-splunk::setup_auth'
-include_recipe 'chef-splunk::initialize_datastore'
+include_recipe 'chef-splunk::setup_datastore_dir'
 
 # ensure that the splunk service resource is available without cloning
 # the resource (CHEF-3694). this is so the later notification works,

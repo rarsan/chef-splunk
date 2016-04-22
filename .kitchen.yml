@@ -84,7 +84,7 @@ suites:
           enable_ssl: true
         web_port: 8443
 
-  - name: server-custom-datastore
+  - name: server-custom-datastore-dir
     run_list:
       - recipe[chef-splunk::default]
     attributes:

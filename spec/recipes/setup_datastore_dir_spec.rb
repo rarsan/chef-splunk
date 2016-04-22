@@ -1,6 +1,6 @@
 require_relative '../spec_helper'
 
-describe 'chef-splunk::initialize_datastore' do
+describe 'chef-splunk::setup_datastore_dir' do
   let(:secrets) do
     {
       'splunk__default' => {
