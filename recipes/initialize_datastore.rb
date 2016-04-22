@@ -27,6 +27,11 @@ rescue Chef::Exceptions::ResourceNotFound
   service 'splunk'
 end
 
+include_recipe 'chef-vault'
+
+passwords = chef_vault_item('vault', "splunk_#{node.chef_environment}")
+splunk_auth_info = passwords['auth']
+
 if node['splunk']['server']['edit_datastore_dir']
   # If using custom SPLUNK_DB path, chown to appropriate user
   directory node['splunk']['server']['datastore_dir'] do
@@ -36,11 +41,11 @@ if node['splunk']['server']['edit_datastore_dir']
   end
 
   execute 'update-datastore-dir' do
-    command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']}"
+    command "#{splunk_cmd} set datastore-dir #{node['splunk']['server']['datastore_dir']} -auth '#{splunk_auth_info}'"
     user splunk_user
     group splunk_user
     not_if { ::File.exist?("#{splunk_dir}/etc/.initialize_datastore") }
-    not_if "#{splunk_cmd} show datastore-dir | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
+    not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
   end
 end
 

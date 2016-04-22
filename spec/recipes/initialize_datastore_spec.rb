@@ -26,7 +26,7 @@ describe 'chef-splunk::initialize_datastore' do
 
   context 'custom datastore dir' do
     before(:each) do
-      stub_command("/opt/splunk/bin/splunk show datastore-dir | grep ': /datadrive'").and_return(false)
+      stub_command("/opt/splunk/bin/splunk show datastore-dir -auth '#{secrets['splunk__default']['auth']}' | grep ': /datadrive'").and_return(false)
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?).with('/opt/splunk/etc/.initialize_datastore').and_return(false)
       chef_run_init.node.set['splunk']['server']['edit_datastore_dir'] = true
@@ -35,7 +35,7 @@ describe 'chef-splunk::initialize_datastore' do
 
     it 'updates the datastore dir' do
       expect(chef_run).to run_execute('update-datastore-dir').with(
-        'command' => "/opt/splunk/bin/splunk set datastore-dir /datadrive"
+        'command' => "/opt/splunk/bin/splunk set datastore-dir /datadrive -auth '#{secrets['splunk__default']['auth']}'"
       )
     end
   end
