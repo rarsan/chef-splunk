@@ -84,6 +84,22 @@ suites:
           enable_ssl: true
         web_port: 8443
 
+  - name: server-custom-datastore
+    run_list:
+      - recipe[chef-splunk::default]
+    attributes:
+      dev_mode: true
+      splunk:
+        server:
+          runasroot: false
+          edit_datastore_dir: true
+          datastore_dir: /var/lib/splunk_db
+        is_server: true
+        accept_license: true
+        ssl_options:
+          enable_ssl: true
+        web_port: 8443
+
   - name: cluster_master
     run_list:
       - recipe[chef-splunk::default]
