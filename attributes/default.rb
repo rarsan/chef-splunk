@@ -21,7 +21,7 @@ default['splunk']['receiver_port']  = '9997'
 default['splunk']['mgmt_port']      = '8089'
 default['splunk']['web_port']       = '443'
 default['splunk']['ratelimit_kilobytessec'] = '2048'
-default['splunk']['splunkdConnectionTimeout'] = 30
+default['splunk']['web_conf'] = {}
 
 default['splunk']['setup_auth'] = true
 default['splunk']['user'] = {
