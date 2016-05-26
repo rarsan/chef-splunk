@@ -23,7 +23,7 @@ splunk_auth_info = chef_vault_item(:vault, "splunk_#{node.chef_environment}")['a
 user, pw = splunk_auth_info.split(':')
 
 execute 'change-admin-user-password-from-default' do
-  command "#{splunk_cmd} edit user #{user} -password '#{pw}' -role admin -auth admin:changeme"
+  command "#{splunk_cmd} edit user #{user} -password '#{pw}' -role admin -auth admin:changeme && touch #{splunk_dir}/etc/.ui_login"
   user splunk_user
   group splunk_user
   environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
