@@ -72,6 +72,7 @@ if !node['splunk']['clustering']['enabled'] || node['splunk']['clustering']['mod
     user splunk_user
     group splunk_user
     environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
+    not_if { ::File.exist?("#{splunk_dir}/etc/.enable_splunktcp") }
     not_if do
       # TCPSocket will return a file descriptor if it can open the
       # connection, and raise Errno::ECONNREFUSED if it can't. We rescue
@@ -83,6 +84,13 @@ if !node['splunk']['clustering']['enabled'] || node['splunk']['clustering']['mod
       end
     end
   end
+
+  file "#{splunk_dir}/etc/.enable_splunktcp" do
+    content 'true\n'
+    owner node['splunk']['user']['username']
+    group node['splunk']['user']['username']
+    mode 00600
+  end
 end
 
 if node['splunk']['ssl_options']['enable_ssl']
@@ -93,6 +101,24 @@ if node['splunk']['clustering']['enabled']
   include_recipe 'chef-splunk::setup_clustering'
 end
 
-service 'splunk' do
-  action :start
+# Ensure that splunk service is running by end of this recipe's execution
+# but only start the service if there is no outstanding delayed restart notification
+# in order to avoid redundant splunk restart
+ruby_block 'ensure_service_up' do
+  block do
+    restart_pending = false
+    node.run_context.delayed_notification_collection.each do |key, notifications|
+      notifications.each do |notification|
+        if notification.action == :restart &&
+          notification.resource.equal?(resources('service[splunk]')) &&
+          notification.notifying_resource.updated
+          restart_pending = true
+          Chef::Log.info("#{notification.action} #{notification.resource.name} by #{notification.notifying_resource.name} currently pending")
+          break
+        end
+      end
+      break if restart_pending
+    end
+    resources('service[splunk]').run_action(:start) unless restart_pending
+  end
 end
