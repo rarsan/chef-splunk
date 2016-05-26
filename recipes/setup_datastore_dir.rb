@@ -35,6 +35,7 @@ splunk_auth_info = passwords['auth']
 if node['splunk']['server']['edit_datastore_dir']
   # If using custom SPLUNK_DB path, chown to appropriate user
   directory node['splunk']['server']['datastore_dir'] do
+    recursive true
     owner splunk_user
     group splunk_user
     mode 00711
