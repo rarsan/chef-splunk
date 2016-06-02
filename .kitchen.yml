@@ -100,6 +100,20 @@ suites:
           enable_ssl: true
         web_port: 8443
 
+  - name: server_base_image
+    run_list:
+      - recipe[chef-vault]
+      - recipe[chef-splunk::user]
+      - recipe[chef-splunk::install_server]
+    attributes:
+      dev_mode: true
+      splunk:
+        server:
+          runasroot: false
+        is_server: true
+    includes:
+      - ubuntu-14.04
+
   - name: cluster_master
     run_list:
       - recipe[chef-splunk::default]
