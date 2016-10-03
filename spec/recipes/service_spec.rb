@@ -29,7 +29,7 @@ describe 'chef-splunk::service' do
       allow(File).to receive(:exist?).with('/opt/splunk/ftr').and_return(true)
       chef_run_init.node.set['splunk']['is_server'] = true
     end
-    
+
     it 'enables the service at boot and accepts the license' do
       expect(chef_run).to run_execute('/opt/splunk/bin/splunk enable boot-start --accept-license --answer-yes')
     end

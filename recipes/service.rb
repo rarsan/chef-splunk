@@ -92,6 +92,7 @@ else
       splunkdir: splunk_dir,
       runasroot: node['splunk']['server']['runasroot']
     )
+  end
 end
 
 file "#{splunk_dir}/etc/.setup_service" do
