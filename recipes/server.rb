@@ -104,9 +104,9 @@ end
 # Ensure that splunk service is running by end of this recipe's execution
 # but only start the service if there is no outstanding delayed restart notification
 # in order to avoid redundant splunk restart
+restart_pending = false
 ruby_block 'ensure_service_up' do
   block do
-    restart_pending = false
     node.run_context.delayed_notification_collection.each do |key, notifications|
       notifications.each do |notification|
         if notification.action == :restart &&
@@ -119,6 +119,7 @@ ruby_block 'ensure_service_up' do
       end
       break if restart_pending
     end
-    resources('service[splunk]').run_action(:start) unless restart_pending
   end
 end
+resources('service[splunk]').run_action(:start) unless restart_pending
+

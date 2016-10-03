@@ -103,6 +103,11 @@ describe 'chef-splunk::server' do
       )
     end
 
+    it 'notifies the splunk service to restart when changing licenser' do
+      execution = chef_run.execute('link-to-license-master')
+      expect(execution).to notify('service[splunk]').to(:restart)
+    end
+
     it 'starts the splunk service' do
       expect(chef_run).to start_service('splunk')
     end
