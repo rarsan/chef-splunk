@@ -122,5 +122,7 @@ ruby_block 'ensure_service_up' do
     end
   end
 end
-resources('service[splunk]').run_action(:start) unless restart_pending
-
+service 'splunk' do
+  action :start
+  not_if { restart_pending }
+end
