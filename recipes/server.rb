@@ -101,28 +101,3 @@ end
 if node['splunk']['clustering']['enabled']
   include_recipe 'chef-splunk::setup_clustering'
 end
-
-# Ensure that splunk service is running by end of this recipe's execution
-# but only start the service if there is no outstanding delayed restart notification
-# in order to avoid redundant splunk restart
-restart_pending = false
-ruby_block 'ensure_service_up' do
-  block do
-    node.run_context.delayed_notification_collection.each do |key, notifications|
-      notifications.each do |notification|
-        if notification.action == :restart &&
-          notification.resource.equal?(resources('service[splunk]')) &&
-          notification.notifying_resource.updated
-          restart_pending = true
-          Chef::Log.info("#{notification.action} #{notification.resource.name} by #{notification.notifying_resource.name} currently pending")
-          break
-        end
-      end
-      break if restart_pending
-    end
-  end
-end
-service 'splunk' do
-  action :start
-  not_if { restart_pending }
-end
