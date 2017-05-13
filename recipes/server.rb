@@ -1,9 +1,8 @@
 #
-# Cookbook Name:: splunk
+# Cookbook:: chef-splunk
 # Recipe:: server
 #
-# Author: Joshua Timberman <joshua@chef.io>
-# Copyright (c) 2014, Chef Software, Inc <legal@chef.io>
+# Copyright:: 2014-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +29,9 @@ include_recipe 'chef-splunk::setup_datastore_dir'
 begin
   resources('service[splunk]')
 rescue Chef::Exceptions::ResourceNotFound
-  service 'splunk'
+  service 'splunk' do
+    action :nothing
+  end
 end
 
 # We can rely on loading the chef_vault_item here, as `setup_auth`

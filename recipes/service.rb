@@ -1,9 +1,8 @@
 #
-# Cookbook Name:: splunk
+# Cookbook:: chef-splunk
 # Recipe:: service
 #
-# Author: Joshua Timberman <joshua@chef.io>
-# Copyright (c) 2014, Chef Software, Inc <legal@chef.io>
+# Copyright:: 2014-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,25 +21,25 @@ if node['splunk']['is_server']
   directory splunk_dir do
     owner splunk_user
     group splunk_user
-    mode 00755
+    mode '755'
   end
 
   directory "#{splunk_dir}/var" do
     owner node['splunk']['user']['username']
     group node['splunk']['user']['username']
-    mode 00711
+    mode '711'
   end
 
   directory "#{splunk_dir}/var/log" do
     owner node['splunk']['user']['username']
     group node['splunk']['user']['username']
-    mode 00711
+    mode '711'
   end
 
   directory "#{splunk_dir}/var/log/splunk" do
     owner node['splunk']['user']['username']
     group node['splunk']['user']['username']
-    mode 00700
+    mode '700'
   end
 end
 
@@ -72,7 +71,7 @@ end
 if node['init_package'] == 'systemd'
   template '/usr/lib/systemd/system/splunk.service' do
     source 'splunk-systemd.erb'
-    mode 0700
+    mode '700'
     variables(
       splunkdir: splunk_dir,
       runasroot: node['splunk']['server']['runasroot']
@@ -87,11 +86,17 @@ if node['init_package'] == 'systemd'
 else
   template '/etc/init.d/splunk' do
     source 'splunk-init.erb'
-    mode 0700
+    mode '700'
     variables(
       splunkdir: splunk_dir,
       runasroot: node['splunk']['server']['runasroot']
     )
+  end
+
+  service 'splunk' do
+    supports status: true, restart: true
+    provider Chef::Provider::Service::Init
+    action :start
   end
 end
 
@@ -102,8 +107,3 @@ file "#{splunk_dir}/etc/.setup_service" do
   mode 00600
 end
 
-service 'splunk' do
-  supports status: true, restart: true
-  provider Chef::Provider::Service::Init
-  action :nothing
-end

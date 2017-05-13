@@ -1,9 +1,8 @@
 #
-# Cookbook Name:: splunk
+# Cookbook:: chef-splunk
 # Recipe:: setup_ssl2
 #
-# Author: Joshua Timberman <joshua@chef.io>
-# Copyright (c) 2014, Chef Software, Inc <legal@chef.io>
+# Copyright:: 2014-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +45,7 @@ unless ssl_options['use_default_certs']
     content certs[ssl_options['keyfile']]
     owner node['splunk']['user']['username']
     group node['splunk']['user']['username']
-    mode 00600
+    mode '600'
     notifies :restart, 'service[splunk]'
   end
 
@@ -54,7 +53,7 @@ unless ssl_options['use_default_certs']
     content certs[ssl_options['crtfile']]
     owner node['splunk']['user']['username']
     group node['splunk']['user']['username']
-    mode 00600
+    mode '600'
     notifies :restart, 'service[splunk]'
   end
 end
@@ -63,6 +62,7 @@ template "#{splunk_dir}/etc/system/local/web.conf" do
   source 'system-web.conf.erb'
   owner node['splunk']['user']['username']
   group node['splunk']['user']['username']
+  mode '600'
   variables ssl_options
   notifies :restart, 'service[splunk]'
 end
