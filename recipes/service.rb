@@ -96,7 +96,7 @@ else
   end
 
   service 'splunk' do
-    supports status: true, restart: true
+    supports status: true, restart: true, stop: true
     provider Chef::Provider::Service::Init
     action :start
   end

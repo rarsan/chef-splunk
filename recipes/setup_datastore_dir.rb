@@ -38,7 +38,7 @@ if node['splunk']['server']['edit_datastore_dir']
     recursive true
     owner splunk_user
     group splunk_user
-    mode 00711
+    mode '711'
   end
 
   execute 'update-datastore-dir' do
@@ -48,6 +48,7 @@ if node['splunk']['server']['edit_datastore_dir']
     environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
     not_if { ::File.exist?("#{splunk_dir}/etc/.initialize_datastore") }
     not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
+    notifies :stop, 'service[splunk]', :before
   end
 end
 
@@ -55,5 +56,5 @@ file "#{splunk_dir}/etc/.initialize_datastore" do
   content 'true\n'
   owner node['splunk']['user']['username']
   group node['splunk']['user']['username']
-  mode 00600
+  mode '600'
 end
