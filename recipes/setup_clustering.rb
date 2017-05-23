@@ -44,7 +44,8 @@ is_multisite = cluster_params['num_sites'] > 1
 Chef::Log.debug("Current node clustering mode: #{cluster_mode}")
 
 cluster_master = search(
-  :node, "\
+  :node,
+  "\
   splunk_clustering_enabled:true AND \
   splunk_clustering_mode:master AND \
   chef_environment:#{node.chef_environment}"

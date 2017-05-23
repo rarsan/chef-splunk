@@ -106,7 +106,7 @@ suites:
     includes:
       - ubuntu-14.04
 
-  - name: cluster_master
+  - name: server-cluster-master
     run_list:
       - recipe[chef-splunk::default]
     attributes:

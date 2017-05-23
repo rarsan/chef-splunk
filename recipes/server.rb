@@ -49,7 +49,8 @@ end
 
 if node['splunk']['server']['license'] == 'slave'
   license_master = search( # ~FC003
-    :node, "\
+    :node,
+    "\
     splunk_server_license:master AND \
     chef_environment:#{node.chef_environment}"
   ).first
@@ -75,12 +76,12 @@ if !node['splunk']['clustering']['enabled'] || node['splunk']['clustering']['mod
     environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
     not_if { ::File.exist?("#{splunk_dir}/etc/.enable_splunktcp") }
     not_if do
-      # TCPSocket will return a file descriptor if it can open the
-      # connection, and raise Errno::ECONNREFUSED if it can't. We rescue
+      # TCPSocket will return a file descriptor if it can open the connection,
+      # and raise Errno::ECONNREFUSED or Errno::ETIMEDOUT if it can't. We rescue
       # that exception and return false so not_if works proper-like.
       begin
         ::TCPSocket.new(node['ipaddress'], node['splunk']['receiver_port'])
-      rescue Errno::ECONNREFUSED
+      rescue Errno::ECONNREFUSED, Errno::ETIMEDOUT
         false
       end
     end
