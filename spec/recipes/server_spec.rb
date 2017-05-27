@@ -49,10 +49,6 @@ describe 'chef-splunk::server' do
         'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
       )
     end
-
-    it 'starts the splunk service' do
-      expect(chef_run).to start_service('splunk')
-    end
   end
 
   context 'custom management port' do
@@ -76,10 +72,6 @@ describe 'chef-splunk::server' do
       expect(chef_run).to run_execute('enable-splunk-receiver-port').with(
         'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
       )
-    end
-
-    it 'starts the splunk service' do
-      expect(chef_run).to start_service('splunk')
     end
   end
 
@@ -109,10 +101,6 @@ describe 'chef-splunk::server' do
       execution = chef_run.execute('link-to-license-master')
       expect(execution).to notify('service[splunk]').to(:restart)
     end
-
-    it 'starts the splunk service' do
-      expect(chef_run).to start_service('splunk')
-    end
   end
 
   context 'clustering enabled' do
@@ -131,10 +119,6 @@ describe 'chef-splunk::server' do
           'command' => "/opt/splunk/bin/splunk enable listen 9997 -auth '#{secrets['splunk__default']['auth']}'"
         )
       end
-
-      it 'starts the splunk service' do
-        expect(chef_run).to start_service('splunk')
-      end
     end
 
     context 'non indexer node (master)' do
@@ -145,10 +129,6 @@ describe 'chef-splunk::server' do
       it 'does not enable receiver port' do
         expect(chef_run).to_not run_execute('enable-splunk-receiver-port')
       end
-
-      it 'starts the splunk service' do
-        expect(chef_run).to start_service('splunk')
-      end
     end
 
     context 'non indexer node (search head)' do
@@ -158,10 +138,6 @@ describe 'chef-splunk::server' do
 
       it 'does not enable receiver port' do
         expect(chef_run).to_not run_execute('enable-splunk-receiver-port')
-      end
-
-      it 'starts the splunk service' do
-        expect(chef_run).to start_service('splunk')
       end
     end
   end
