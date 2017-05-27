@@ -84,6 +84,7 @@ if node['init_package'] == 'systemd'
     supports status: true, restart: true
     provider Chef::Provider::Service::Systemd
     action [:enable, :start]
+    only_if { node['splunk']['accept_license'] }
   end
 else
   template '/etc/init.d/splunk' do
@@ -99,6 +100,7 @@ else
     supports status: true, restart: true, stop: true
     provider Chef::Provider::Service::Init
     action :start
+    only_if { node['splunk']['accept_license'] }
   end
 end
 
