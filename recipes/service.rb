@@ -109,5 +109,6 @@ file "#{splunk_dir}/etc/.setup_service" do
   owner node['splunk']['user']['username']
   group node['splunk']['user']['username']
   mode 00600
+  only_if { node['splunk']['accept_license'] }
 end
 
