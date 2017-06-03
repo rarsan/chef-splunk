@@ -209,6 +209,7 @@ suites:
           search_factor: 3
         ssl_options:
           enable_ssl: true
+        web_port: 8443
 
   - name: server-shcluster-member
     run_list:
