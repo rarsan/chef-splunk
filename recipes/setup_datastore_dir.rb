@@ -48,7 +48,8 @@ if node['splunk']['server']['edit_datastore_dir']
     environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
     not_if { ::File.exist?("#{splunk_dir}/etc/.initialize_datastore") }
     not_if "#{splunk_cmd} show datastore-dir -auth '#{splunk_auth_info}' | grep ': #{node['splunk']['server']['datastore_dir']}'", :user => splunk_user
-    notifies :stop, 'service[splunk]', :before
+    notifies :stop, 'service[splunk]', :before # Splunk must be stopped before changing SPLUNK_DB
+    notifies :restart, 'service[splunk]', :delayed
   end
 end
 

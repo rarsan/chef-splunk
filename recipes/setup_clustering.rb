@@ -79,18 +79,14 @@ end
 
 splunk_cmd_params << " -secret #{cluster_secret}" if cluster_secret
 
-# Splunk must be running before edit cluster-config command
-service 'splunk' do
-  action :start
-end
-
 execute 'setup-indexer-cluster' do
   command "#{splunk_cmd} edit cluster-config #{splunk_cmd_params} -auth '#{splunk_auth_info}'"
   user splunk_user
   group splunk_user
   environment ({'HOME' => splunk_dir, 'USER' => splunk_user})
   not_if { ::File.exist?("#{splunk_dir}/etc/.setup_clustering") }
-  notifies :restart, 'service[splunk]'
+  notifies :start, 'service[splunk]', :before # Splunk must be running before edit cluster-config command
+  notifies :restart, 'service[splunk]', :delayed
 end
 
 file "#{splunk_dir}/etc/.setup_clustering" do
